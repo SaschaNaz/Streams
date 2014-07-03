@@ -67,7 +67,7 @@
         });
     }
 
-    readLines(oneach: (result: string) => any) {
+    readLines(oneach?: (result: string) => any) {
         return new Promise<any>((resolve, reject) => {
             var asyncFunction = () => {
                 this.readLine().then((result) => {
