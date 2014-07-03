@@ -6,7 +6,7 @@
     private sliceSize;
     public left: number;
     constructor(blob: Blob);
-    private readNextSlice(oncomplete);
-    public readLine(oncomplete: (result: string) => any): void;
-    public readLines(oneach: (result: string) => any, oncomplete: () => any): void;
+    private readNextSlice();
+    public readLine(): Promise<string>;
+    public readLines(oneach: (result: string) => any): Promise<any>;
 }
