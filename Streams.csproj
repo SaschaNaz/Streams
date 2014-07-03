@@ -23,6 +23,7 @@
   </ItemGroup>
   <ItemGroup>
     <TypeScriptCompile Include="sources\blobstream.ts" />
+    <TypeScriptCompile Include="submodules\es6-promises.d.ts" />
   </ItemGroup>
   <ItemGroup>
     <None Include="web.Debug.config">
