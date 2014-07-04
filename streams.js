@@ -80,4 +80,9 @@
     };
     return BlobStream;
 })();
+var ByteStream = (function () {
+    function ByteStream(pullAmount, type) {
+    }
+    return ByteStream;
+})();
 //# sourceMappingURL=streams.js.map
