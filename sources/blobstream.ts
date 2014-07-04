@@ -18,7 +18,7 @@
         else
             this.sliceIndex++;
         var start = this.sliceIndex * this.sliceSize;
-        return new Promise<any>((resolve, reject) => {
+        return new Promise<void>((resolve, reject) => {
             if (this.left == 0)
                 reject(new Error("No left input stream"));
             else {
@@ -68,7 +68,7 @@
     }
 
     readLines(oneach?: (result: string) => any) {
-        return new Promise<any>((resolve, reject) => {
+        return new Promise<void>((resolve, reject) => {
             var asyncFunction = () => {
                 this.readLine().then((result) => {
                     window.setImmediate(oneach, result);

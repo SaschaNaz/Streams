@@ -8,5 +8,5 @@
     constructor(blob: Blob);
     private readNextSlice();
     public readLine(): Promise<string>;
-    public readLines(oneach: (result: string) => any): Promise<any>;
+    public readLines(oneach?: (result: string) => any): Promise<void>;
 }
