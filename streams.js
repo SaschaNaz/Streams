@@ -83,6 +83,43 @@
 var ByteStream = (function () {
     function ByteStream(pullAmount, type) {
     }
+    ByteStream.prototype.fork = function () {
+        var branch;
+    };
     return ByteStream;
+})();
+
+var _ReadableStream = (function () {
+    function _ReadableStream() {
+        this._readBytesPullAmount = 0;
+        this._pipePullAmount = 0;
+        this._amountRequested = 0;
+        this._amountBeingReturned = 0;
+        this._readDataBuffer = [];
+        this._splicedBinaryBuffer = [];
+    }
+    _ReadableStream.prototype.read = function () {
+    };
+    _ReadableStream.prototype.pipe = function (destination) {
+    };
+    _ReadableStream.prototype.fork = function () {
+        var branch = new _ReadableStream();
+        branch._dataSource = this._dataSource;
+        branch._amountRequested = this._amountRequested;
+    };
+    _ReadableStream.prototype.readAbort = function (reason) {
+    };
+
+    _ReadableStream.prototype.readBytes = function (size) {
+    };
+    _ReadableStream.prototype.pipeBytes = function (destination, size) {
+    };
+    return _ReadableStream;
+})();
+
+var _WriteableStream = (function () {
+    function _WriteableStream() {
+    }
+    return _WriteableStream;
 })();
 //# sourceMappingURL=streams.js.map
