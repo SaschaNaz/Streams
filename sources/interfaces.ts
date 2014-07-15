@@ -22,6 +22,9 @@ interface ReadableStream {
     pipeBytes(destination: WritableStream, size?: number): Promise<StreamReadResult>;
 }
 
+interface ByteStream extends WritableStream, ReadableStream {
+}
+
 interface StreamReadResult {
     eof: boolean;
     data: any;
