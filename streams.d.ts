@@ -28,13 +28,13 @@ interface ReadableStream {
     readBytes(size?: number): Promise<StreamReadResult>;
     pipeBytes(destination: WritableStream, size?: number): Promise<StreamReadResult>;
 }
+interface ByteStream extends WritableStream, ReadableStream {
+}
 interface StreamReadResult {
     eof: boolean;
     data: any;
     amountConsumed: number;
     error: any;
-}
-interface ByteStream extends ReadableStream, WritableStream {
 }
 interface URL {
     createObjectURL(stream: ReadableStream, type: string): string;
