@@ -1,12 +1,17 @@
 ﻿declare class BlobStream {
     public blob: Blob;
-    private indexInSlice;
-    private slice;
-    private sliceIndex;
-    private sliceSize;
-    public left: number;
+    private _bufferOffset;
+    private _buffer;
+    private _bufferSliceIndex;
+    private _left;
+    public pullAmount: number;
+    public readBytesAs: string;
+    public readEncoding: string;
     constructor(blob: Blob);
-    private readNextSlice();
+    public read(): Promise<StreamReadResult>;
+    public readBytes(length: number): Promise<StreamReadResult>;
+    private _mergeArray(base, input);
+    private _readNextSlice();
     public readLine(): Promise<string>;
     public readLines(oneach?: (result: string) => any): Promise<void>;
 }
