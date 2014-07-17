@@ -26,6 +26,7 @@
     <TypeScriptCompile Include="sources\blobstream.ts" />
     <TypeScriptCompile Include="sources\bytestream.ts" />
     <TypeScriptCompile Include="sources\interfaces.ts" />
+    <TypeScriptCompile Include="sources\textdecoder.ts" />
     <TypeScriptCompile Include="submodules\es6-promises.d.ts" />
   </ItemGroup>
   <ItemGroup>

@@ -51,8 +51,8 @@
         if (this.index + bytes <= this.filearray.length) {
             var uint = 0;
             for (var i = 0; i < bytes; i++)
-                uint += (this.filearray[this.index + i] << (i * 8))
-                this.index += bytes;
+                uint += (this.filearray[this.index + i] << (i * 8));
+            this.index += bytes;
             return uint;
         }
         else
