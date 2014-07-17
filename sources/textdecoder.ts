@@ -1,6 +1,6 @@
 ﻿module Streams {
     export interface DecodingResult {
-        data: any;
+        text: any;
         byteLength: number;
     }
     export class TextDecoder {

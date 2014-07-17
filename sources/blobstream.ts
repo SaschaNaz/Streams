@@ -7,6 +7,14 @@
         encoding: string;
     }
 
+    class BlobSourceBuffer {
+        /*
+        more advanced buffer feature
+        producing requsted data and reattaching unconsumed data
+        _readNextSlice method will be internalized here
+        */
+    }
+
     export class BlobStream {
         private _dataBufferOffset = 0;
         private _readDataBuffer: Blob = null;
@@ -92,8 +100,10 @@
                     var left = amountConsumed - decoded.byteLength;
                     if (left != 0) {
                         amountConsumed = decoded.byteLength;
-
+                        //reattach unconsumed data to buffer
+                        this._eofReached = false;
                     }
+                    data = decoded.text;
                     break;
             }
 

@@ -1,5 +1,11 @@
 ﻿var Streams;
 (function (Streams) {
+    var BlobSourceBuffer = (function () {
+        function BlobSourceBuffer() {
+        }
+        return BlobSourceBuffer;
+    })();
+
     var BlobStream = (function () {
         function BlobStream(blob) {
             this._dataBufferOffset = 0;
@@ -86,7 +92,11 @@
                     var left = amountConsumed - decoded.byteLength;
                     if (left != 0) {
                         amountConsumed = decoded.byteLength;
+
+                        //reattach unconsumed data to buffer
+                        this._eofReached = false;
                     }
+                    data = decoded.text;
                     break;
             }
 
