@@ -56,9 +56,9 @@ declare module Streams {
         byteLength: number;
     }
     class TextDecoder {
-        static decodeAsUtf8(byteArray: number[]): DecodingResult;
-        static decodeAsUtf16(byteArray: number[]): DecodingResult;
-        private static _readAsUint16(byteArray);
-        private static _readAsUintArbitrary(byteArray, bytes);
+        static decode(byteArray: number[], encoding: string): DecodingResult;
+        private static _decodeAsUtf8(byteArray);
+        private static _decodeAsUtf16(byteArray);
+        private static _decodeAsLatin1(byteArray);
     }
 }

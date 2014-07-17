@@ -4,7 +4,19 @@
         byteLength: number;
     }
     export class TextDecoder {
-        static decodeAsUtf8(byteArray: number[]) {
+        static decode(byteArray: number[], encoding: string): DecodingResult {
+            switch (encoding.toLowerCase()) {
+                case 'utf-8':
+                default:
+                    return this._decodeAsUtf8(byteArray);
+                case 'utf-16':
+                    return this._decodeAsUtf16(byteArray);
+                case 'latin1':
+                case 'iso-8859-1':
+                    return this._decodeAsLatin1(byteArray);
+            }
+        }
+        private static _decodeAsUtf8(byteArray: number[]) {
             var text = '';
             var byteLength = 0;
             var length = byteArray.length;
@@ -52,12 +64,12 @@
                 byteLength: byteLength
             }
         }
-        static decodeAsUtf16(byteArray: number[]) {
+        private static _decodeAsUtf16(byteArray: number[]) {
             var text = '';
             var byteLength = 0;
             var length = byteArray.length;
             while (length - byteLength >= 2) {
-                text += String.fromCharCode(this._readAsUint16(byteArray.slice(byteLength, byteLength + 2)));
+                text += String.fromCharCode(UIntReader.readAsUint16(byteArray.slice(byteLength, byteLength + 2)));
                 byteLength += 2;
             }
             return <DecodingResult>{
@@ -65,12 +77,26 @@
                 byteLength: byteLength
             }
         }
-
-        private static _readAsUint16(byteArray: number[]) {
-            return this._readAsUintArbitrary(byteArray, 2);
+        private static _decodeAsLatin1(byteArray: number[]) {
+            var text = '';
+            var byteLength = 0;
+            var length = byteArray.length;
+            while (length - byteLength >= 1) {
+                text += String.fromCharCode(byteArray[byteLength]);
+                byteLength += 1;
+            }
+            return <DecodingResult>{
+                data: text,
+                byteLength: byteLength
+            }
+        }
+    }
+    class UIntReader {
+        static readAsUint16(byteArray: number[]) {
+            return this.readAsUintArbitrary(byteArray, 2);
         }
         //little endian
-        private static _readAsUintArbitrary(byteArray: number[], bytes: number) {
+        static readAsUintArbitrary(byteArray: number[], bytes: number) {
             var uint = 0;
             for (var i = 0; i < bytes; i++)
                 uint += (byteArray[i] << (i * 8));

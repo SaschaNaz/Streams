@@ -82,9 +82,15 @@
                     data = new Uint8Array(byteArray).buffer;
                     break;
                 case "text":
+                    var decoded = Streams.TextDecoder.decode(byteArray, this._pendingRead.encoding);
+                    var left = amountConsumed - decoded.byteLength;
+                    if (left != 0) {
+                        amountConsumed = decoded.byteLength;
+                    }
                     break;
             }
 
+            this._pendingRead = null;
             return {
                 amountConsumed: amountConsumed,
                 data: data,
@@ -233,7 +239,19 @@ var Streams;
     var TextDecoder = (function () {
         function TextDecoder() {
         }
-        TextDecoder.decodeAsUtf8 = function (byteArray) {
+        TextDecoder.decode = function (byteArray, encoding) {
+            switch (encoding.toLowerCase()) {
+                case 'utf-8':
+                default:
+                    return this._decodeAsUtf8(byteArray);
+                case 'utf-16':
+                    return this._decodeAsUtf16(byteArray);
+                case 'latin1':
+                case 'iso-8859-1':
+                    return this._decodeAsLatin1(byteArray);
+            }
+        };
+        TextDecoder._decodeAsUtf8 = function (byteArray) {
             var text = '';
             var byteLength = 0;
             var length = byteArray.length;
@@ -268,12 +286,12 @@ var Streams;
                 byteLength: byteLength
             };
         };
-        TextDecoder.decodeAsUtf16 = function (byteArray) {
+        TextDecoder._decodeAsUtf16 = function (byteArray) {
             var text = '';
             var byteLength = 0;
             var length = byteArray.length;
             while (length - byteLength >= 2) {
-                text += String.fromCharCode(this._readAsUint16(byteArray.slice(byteLength, byteLength + 2)));
+                text += String.fromCharCode(UIntReader.readAsUint16(byteArray.slice(byteLength, byteLength + 2)));
                 byteLength += 2;
             }
             return {
@@ -281,20 +299,37 @@ var Streams;
                 byteLength: byteLength
             };
         };
-
-        TextDecoder._readAsUint16 = function (byteArray) {
-            return this._readAsUintArbitrary(byteArray, 2);
+        TextDecoder._decodeAsLatin1 = function (byteArray) {
+            var text = '';
+            var byteLength = 0;
+            var length = byteArray.length;
+            while (length - byteLength >= 1) {
+                text += String.fromCharCode(byteArray[byteLength]);
+                byteLength += 1;
+            }
+            return {
+                data: text,
+                byteLength: byteLength
+            };
+        };
+        return TextDecoder;
+    })();
+    Streams.TextDecoder = TextDecoder;
+    var UIntReader = (function () {
+        function UIntReader() {
+        }
+        UIntReader.readAsUint16 = function (byteArray) {
+            return this.readAsUintArbitrary(byteArray, 2);
         };
 
         //little endian
-        TextDecoder._readAsUintArbitrary = function (byteArray, bytes) {
+        UIntReader.readAsUintArbitrary = function (byteArray, bytes) {
             var uint = 0;
             for (var i = 0; i < bytes; i++)
                 uint += (byteArray[i] << (i * 8));
             return uint;
         };
-        return TextDecoder;
+        return UIntReader;
     })();
-    Streams.TextDecoder = TextDecoder;
 })(Streams || (Streams = {}));
 //# sourceMappingURL=streams.js.map

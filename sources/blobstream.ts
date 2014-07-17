@@ -88,10 +88,16 @@
                     data = new Uint8Array(byteArray).buffer;
                     break;
                 case "text":
+                    var decoded = TextDecoder.decode(byteArray, this._pendingRead.encoding);
+                    var left = amountConsumed - decoded.byteLength;
+                    if (left != 0) {
+                        amountConsumed = decoded.byteLength;
 
+                    }
                     break;
             }
-            
+
+            this._pendingRead = null;
             return <StreamReadResult>{
                 amountConsumed: amountConsumed,
                 data: data,
