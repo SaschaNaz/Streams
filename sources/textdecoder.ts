@@ -1,9 +1,9 @@
 ﻿module Streams {
-    interface DecodingResult {
+    export interface DecodingResult {
         text: any;
         byteLength: number;
     }
-    class TextDecoder {
+    export class TextDecoder {
         static decode(byteArray: number[], encoding: string): DecodingResult {
             switch (encoding.toLowerCase()) {
                 case 'utf-8':

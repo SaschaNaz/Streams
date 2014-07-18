@@ -23,6 +23,7 @@
   </ItemGroup>
   <ItemGroup>
     <TypeScriptCompile Include="sources\arrayedstream.ts" />
+    <TypeScriptCompile Include="sources\blobsourcebuffer.ts" />
     <TypeScriptCompile Include="sources\blobstream.ts" />
     <TypeScriptCompile Include="sources\bytestream.ts" />
     <TypeScriptCompile Include="sources\interfaces.ts" />

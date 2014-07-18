@@ -1,4 +1,29 @@
 ﻿declare module Streams {
+    /**
+    Produces requested data and reattaches unconsumed data.
+    */
+    class BlobSourceBuffer {
+        private _slicedCurrent;
+        /** Countercurrent stack. Last unconsumed data would be pushed into here and later popped out first. */
+        private _countercurrent;
+        private _blob;
+        /** Represents byte length of unsliced part. */
+        private _leftCost;
+        private _offsetWithinSlice;
+        private _sliceSize;
+        public eofReached: boolean;
+        constructor(blob: Blob);
+        public produce(size: number): Promise<number[]>;
+        /** Attaches unconsumed data to _countercurrent. */
+        public reattach(byteArray: number[]): void;
+        /** Exports elements from countercurrent as much as possible. */
+        private _exportCountercurrent(size);
+        public seek(offset: number): Promise<void>;
+        private _readNextSlice();
+        private _readSlice(offset);
+    }
+}
+declare module Streams {
     class BlobStream {
         private _dataBufferOffset;
         private _readDataBuffer;
