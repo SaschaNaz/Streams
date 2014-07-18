@@ -3,12 +3,13 @@
     var BlobSourceBuffer = (function () {
         function BlobSourceBuffer(blob) {
             /*
-            more advanced buffer feature
-            producing requested data and reattaching unconsumed data
+            More advanced buffer feature
+            Produces requested data and reattaches unconsumed data
             _readNextSlice method will be internalized here
             _readDataBuffer would be this
             */
             this._slicedCurrent = new ArrayBuffer(0);
+            /** Countercurrent stack. Last unconsumed data would be pushed into here and later popped out first. */
             this._countercurrent = [];
             this._sliceSize = 1024 * 1024 * 10;
             this._blob = blob;
@@ -18,13 +19,25 @@
             //First empty _countercurrent if there is any element
             //Will return Promise<number[]>
         };
+
+        /** Attaches unconsumed data to _countercurrent */
         BlobSourceBuffer.prototype.reattach = function (byteArray) {
-            //attach unconsumed data to _countercurrent
+            Array.prototype.push.apply(this._countercurrent, byteArray);
         };
         BlobSourceBuffer.prototype.seek = function (offset) {
-            //if the offset paramater is within current slice: simply change _sliceOffset
-            //else: read new slice by _readSlice(offset);
-            //Will return Promise<void>
+            /*
+            If the offset paramater is within current slice: simply change _sliceOffset
+            Else: read new slice by _readSlice(offset);
+            Will return Promise <void>
+            */
+            var sliceEndOffset = this._blob.size - this._leftCost;
+            var sliceStartOffset = sliceEndOffset - this._slicedCurrent.byteLength;
+            if (offset >= sliceStartOffset && offset < sliceEndOffset) {
+                this._offsetWithinSlice = offset - sliceStartOffset;
+                return Promise.resolve(undefined);
+            } else {
+                return this._readSlice(offset);
+            }
         };
 
         BlobSourceBuffer.prototype._readNextSlice = function () {
@@ -44,7 +57,7 @@
                     reader.onload = function (ev) {
                         _this._slicedCurrent = ev.target.result;
                         _this._leftCost = _this._blob.size - end;
-                        _this._sliceOffset = 0;
+                        _this._offsetWithinSlice = 0;
                         resolve(undefined);
                     };
                     reader.readAsArrayBuffer(_this._blob.slice(offset, end));
@@ -136,7 +149,7 @@
                     data = new Uint8Array(byteArray).buffer;
                     break;
                 case "text":
-                    var decoded = Streams.TextDecoder.decode(byteArray, this._pendingRead.encoding);
+                    var decoded = TextDecoder.decode(byteArray, this._pendingRead.encoding);
                     var left = amountConsumed - decoded.byteLength;
                     if (left != 0) {
                         amountConsumed = decoded.byteLength;
@@ -372,7 +385,6 @@ var Streams;
         };
         return TextDecoder;
     })();
-    Streams.TextDecoder = TextDecoder;
     var UIntReader = (function () {
         function UIntReader() {
         }

@@ -9,16 +9,17 @@
 
     class BlobSourceBuffer {
         /*
-        more advanced buffer feature
-        producing requested data and reattaching unconsumed data
+        More advanced buffer feature
+        Produces requested data and reattaches unconsumed data
         _readNextSlice method will be internalized here
         _readDataBuffer would be this
         */
         private _slicedCurrent = new ArrayBuffer(0);
+        /** Countercurrent stack. Last unconsumed data would be pushed into here and later popped out first. */
         private _countercurrent: number[] = [];
         private _blob: Blob;
         private _leftCost: number;
-        private _sliceOffset: number;
+        private _offsetWithinSlice: number;
         private _sliceSize = 1024 * 1024 * 10;
         constructor(blob: Blob) {
             this._blob = blob;
@@ -29,13 +30,26 @@
             //First empty _countercurrent if there is any element
             //Will return Promise<number[]>
         }
+        /** Attaches unconsumed data to _countercurrent */
         reattach(byteArray: number[]) {
-            //attach unconsumed data to _countercurrent
+            Array.prototype.push.apply(this._countercurrent, byteArray);
         }
         seek(offset: number) {
-            //if the offset paramater is within current slice: simply change _sliceOffset
-            //else: read new slice by _readSlice(offset);
-            //Will return Promise<void>
+            /*
+            If the offset paramater is within current slice: simply change _sliceOffset
+            Else: read new slice by _readSlice(offset);
+            Will return Promise <void>
+            */
+
+            var sliceEndOffset = this._blob.size - this._leftCost;
+            var sliceStartOffset = sliceEndOffset - this._slicedCurrent.byteLength;
+            if (offset >= sliceStartOffset && offset < sliceEndOffset) {
+                this._offsetWithinSlice = offset - sliceStartOffset;
+                return Promise.resolve<void>(undefined);
+            }
+            else {
+                return this._readSlice(offset);
+            }
         }
 
         private _readNextSlice() {
@@ -54,7 +68,7 @@
                     reader.onload = (ev: ProgressEvent) => {
                         this._slicedCurrent = <ArrayBuffer>(<FileReader>ev.target).result;
                         this._leftCost = this._blob.size - end;
-                        this._sliceOffset = 0;
+                        this._offsetWithinSlice = 0;
                         resolve(undefined);
                     };
                     reader.readAsArrayBuffer(this._blob.slice(offset, end));
