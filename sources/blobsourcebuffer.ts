@@ -24,8 +24,6 @@
         }
 
         produce(size: number) {
-            //First empty _countercurrent if there is any element
-            //Will return Promise<number[]>
             return new Promise<number[]>((resolve, reject) => {
                 if (this.eofReached)
                     reject("Buffer reached EOF.");
@@ -33,7 +31,7 @@
                 var byteArray: number[] = []; // to be returned as ArrayBuffer
                 var pending = size;
 
-                if (this._countercurrent.length) { // export from countercurrent
+                if (this._countercurrent.length) { // first empty _countercurrent if there is any element
                     // export as much as possible
                     var exported = this._exportCountercurrent(pending);
                     Array.prototype.push.apply(byteArray, exported); // merge to byteArray
@@ -64,7 +62,7 @@
                 window.setImmediate(asyncOperation);
             });
         }
-        /** Attaches unconsumed data to _countercurrent. */
+        /** Reattaches unconsumed data to _countercurrent. */
         reattach(byteArray: number[]) {
             Array.prototype.push.apply(this._countercurrent, byteArray);
         }

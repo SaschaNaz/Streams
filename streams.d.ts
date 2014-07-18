@@ -14,7 +14,7 @@
         public eofReached : boolean;
         constructor(blob: Blob);
         public produce(size: number): Promise<number[]>;
-        /** Attaches unconsumed data to _countercurrent. */
+        /** Reattaches unconsumed data to _countercurrent. */
         public reattach(byteArray: number[]): void;
         /** Exports elements from countercurrent as much as possible. */
         private _exportCountercurrent(size);

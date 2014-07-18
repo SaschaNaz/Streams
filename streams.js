@@ -26,8 +26,6 @@
 
         BlobSourceBuffer.prototype.produce = function (size) {
             var _this = this;
-            //First empty _countercurrent if there is any element
-            //Will return Promise<number[]>
             return new Promise(function (resolve, reject) {
                 if (_this.eofReached)
                     reject("Buffer reached EOF.");
@@ -67,7 +65,7 @@
             });
         };
 
-        /** Attaches unconsumed data to _countercurrent. */
+        /** Reattaches unconsumed data to _countercurrent. */
         BlobSourceBuffer.prototype.reattach = function (byteArray) {
             Array.prototype.push.apply(this._countercurrent, byteArray);
         };
