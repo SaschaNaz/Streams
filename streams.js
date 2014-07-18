@@ -18,7 +18,7 @@
         }
         Object.defineProperty(BlobSourceBuffer.prototype, "eofReached", {
             get: function () {
-                return this._leftCost == 0 && this._offsetWithinSlice == this._slicedCurrent.byteLength;
+                return this._leftCost == 0 && this._offsetWithinSlice == this._slicedCurrent.byteLength && this._countercurrent.length == 0;
             },
             enumerable: true,
             configurable: true
@@ -125,7 +125,6 @@ var Streams;
         function BlobStream(blob) {
             this._readDataBuffer = null;
             this._pendingRead = null;
-            this._eofReached = false;
             //private _readBytesPullAmount = 0;
             //private _amountBeingReturned = 0;
             this.pullAmount = 1024 * 1024 * 10;
@@ -133,6 +132,14 @@ var Streams;
             this.readEncoding = "utf-8";
             this._readDataBuffer = new Streams.BlobSourceBuffer(blob);
         }
+        Object.defineProperty(BlobStream.prototype, "_eofReached", {
+            get: function () {
+                return this._readDataBuffer.eofReached;
+            },
+            enumerable: true,
+            configurable: true
+        });
+
         BlobStream.prototype.read = function () {
             return this.readBytes(this.pullAmount);
         };
@@ -180,7 +187,7 @@ var Streams;
                         amountConsumed = decoded.byteLength;
 
                         //reattach unconsumed data to buffer
-                        this._eofReached = false;
+                        this._readDataBuffer.reattach(byteArray.slice(amountConsumed, byteArray.length));
                     }
                     data = decoded.text;
                     break;

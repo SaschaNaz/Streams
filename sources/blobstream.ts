@@ -10,7 +10,9 @@
     export class BlobStream {
         private _readDataBuffer: BlobSourceBuffer = null;
         private _pendingRead: PendingReadDescriptor = null;
-        private _eofReached = false;
+        private get _eofReached() {
+            return this._readDataBuffer.eofReached;
+        }
         //private _readBytesPullAmount = 0;
         //private _amountBeingReturned = 0;
 
@@ -64,7 +66,7 @@
                     if (left != 0) {
                         amountConsumed = decoded.byteLength;
                         //reattach unconsumed data to buffer
-                        this._eofReached = false;
+                        this._readDataBuffer.reattach(byteArray.slice(amountConsumed, byteArray.length));
                     }
                     data = decoded.text;
                     break;

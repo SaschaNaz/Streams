@@ -16,7 +16,9 @@
         private _offsetWithinSlice: number;
         private _sliceSize = 1024 * 1024 * 10;
         get eofReached() {
-            return this._leftCost == 0 && this._offsetWithinSlice == this._slicedCurrent.byteLength;
+            return this._leftCost == 0
+                && this._offsetWithinSlice == this._slicedCurrent.byteLength
+                && this._countercurrent.length == 0;
         }
         constructor(blob: Blob) {
             this._blob = blob;
