@@ -60,7 +60,7 @@
                     break;
             }
             return <DecodingResult>{
-                data: text,
+                text: text,
                 byteLength: byteLength
             }
         }
@@ -73,7 +73,7 @@
                 byteLength += 2;
             }
             return <DecodingResult>{
-                data: text,
+                text: text,
                 byteLength: byteLength
             }
         }
@@ -86,7 +86,7 @@
                 byteLength += 1;
             }
             return <DecodingResult>{
-                data: text,
+                text: text,
                 byteLength: byteLength
             }
         }

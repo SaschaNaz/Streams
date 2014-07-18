@@ -10,9 +10,55 @@
     class BlobSourceBuffer {
         /*
         more advanced buffer feature
-        producing requsted data and reattaching unconsumed data
+        producing requested data and reattaching unconsumed data
         _readNextSlice method will be internalized here
+        _readDataBuffer would be this
         */
+        private _slicedCurrent = new ArrayBuffer(0);
+        private _countercurrent: number[] = [];
+        private _blob: Blob;
+        private _leftCost: number;
+        private _sliceOffset: number;
+        private _sliceSize = 1024 * 1024 * 10;
+        constructor(blob: Blob) {
+            this._blob = blob;
+            this._leftCost = blob.size;
+        }
+
+        produce(size: number) {
+            //First empty _countercurrent if there is any element
+        }
+        reattach() {
+            //attach unconsumed data to _countercurrent
+        }
+        seek(offset: number) {
+            //if the offset paramater is within current slice: simply change _sliceOffset
+            //else: read new slice by _readSlice(offset);
+        }
+
+        private _readNextSlice() {
+            return this._readSlice(this._blob.size - this._leftCost);
+        }
+
+        private _readSlice(offset: number) {
+            return new Promise<void>((resolve, reject) => {
+                var postOffsetSize = this._blob.size - offset;
+                if (postOffsetSize <= 0)
+                    reject(new Error("Offset parameter exceeds blob size."));
+                else {
+                    var end = offset + Math.min(this._sliceSize, postOffsetSize);
+
+                    var reader = new FileReader();
+                    reader.onload = (ev: ProgressEvent) => {
+                        this._slicedCurrent = <ArrayBuffer>(<FileReader>ev.target).result;
+                        this._leftCost = this._blob.size - end;
+                        this._sliceOffset = 0;
+                        resolve(undefined);
+                    };
+                    reader.readAsArrayBuffer(this._blob.slice(offset, end));
+                }
+            });
+        }
     }
 
     export class BlobStream {

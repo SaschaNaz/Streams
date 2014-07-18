@@ -1,8 +1,54 @@
 ﻿var Streams;
 (function (Streams) {
     var BlobSourceBuffer = (function () {
-        function BlobSourceBuffer() {
+        function BlobSourceBuffer(blob) {
+            /*
+            more advanced buffer feature
+            producing requested data and reattaching unconsumed data
+            _readNextSlice method will be internalized here
+            _readDataBuffer would be this
+            */
+            this._slicedCurrent = new ArrayBuffer(0);
+            this._countercurrent = [];
+            this._sliceSize = 1024 * 1024 * 10;
+            this._blob = blob;
+            this._leftCost = blob.size;
         }
+        BlobSourceBuffer.prototype.produce = function (size) {
+            //First empty _countercurrent if there is any element
+        };
+        BlobSourceBuffer.prototype.reattach = function () {
+            //attach unconsumed data to _countercurrent
+        };
+        BlobSourceBuffer.prototype.seek = function (offset) {
+            //if the offset paramater is within current slice: simply change _sliceOffset
+            //else: read new slice by _readSlice(offset);
+        };
+
+        BlobSourceBuffer.prototype._readNextSlice = function () {
+            return this._readSlice(this._blob.size - this._leftCost);
+        };
+
+        BlobSourceBuffer.prototype._readSlice = function (offset) {
+            var _this = this;
+            return new Promise(function (resolve, reject) {
+                var postOffsetSize = _this._blob.size - offset;
+                if (postOffsetSize <= 0)
+                    reject(new Error("Offset parameter exceeds blob size."));
+                else {
+                    var end = offset + Math.min(_this._sliceSize, postOffsetSize);
+
+                    var reader = new FileReader();
+                    reader.onload = function (ev) {
+                        _this._slicedCurrent = ev.target.result;
+                        _this._leftCost = _this._blob.size - end;
+                        _this._sliceOffset = 0;
+                        resolve(undefined);
+                    };
+                    reader.readAsArrayBuffer(_this._blob.slice(offset, end));
+                }
+            });
+        };
         return BlobSourceBuffer;
     })();
 
@@ -292,7 +338,7 @@ var Streams;
                     break;
             }
             return {
-                data: text,
+                text: text,
                 byteLength: byteLength
             };
         };
@@ -305,7 +351,7 @@ var Streams;
                 byteLength += 2;
             }
             return {
-                data: text,
+                text: text,
                 byteLength: byteLength
             };
         };
@@ -318,7 +364,7 @@ var Streams;
                 byteLength += 1;
             }
             return {
-                data: text,
+                text: text,
                 byteLength: byteLength
             };
         };

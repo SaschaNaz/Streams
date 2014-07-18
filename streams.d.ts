@@ -52,7 +52,7 @@ interface URL {
 }
 declare module Streams {
     interface DecodingResult {
-        data: any;
+        text: any;
         byteLength: number;
     }
     class TextDecoder {
