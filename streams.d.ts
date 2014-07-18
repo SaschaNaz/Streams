@@ -11,7 +11,7 @@
         private _leftCost;
         private _offsetWithinSlice;
         private _sliceSize;
-        public eofReached: boolean;
+        public eofReached : boolean;
         constructor(blob: Blob);
         public produce(size: number): Promise<number[]>;
         /** Attaches unconsumed data to _countercurrent. */

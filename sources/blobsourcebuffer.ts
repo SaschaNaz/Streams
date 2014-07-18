@@ -15,7 +15,9 @@
         private _leftCost: number;
         private _offsetWithinSlice: number;
         private _sliceSize = 1024 * 1024 * 10;
-        eofReached = false;
+        get eofReached() {
+            return this._leftCost == 0 && this._offsetWithinSlice == this._slicedCurrent.byteLength;
+        }
         constructor(blob: Blob) {
             this._blob = blob;
             this._leftCost = blob.size;
@@ -25,6 +27,9 @@
             //First empty _countercurrent if there is any element
             //Will return Promise<number[]>
             return new Promise<number[]>((resolve, reject) => {
+                if (this.eofReached)
+                    reject("Buffer reached EOF.");
+
                 var byteArray: number[] = []; // to be returned as ArrayBuffer
                 var pending = size;
 
@@ -46,13 +51,13 @@
                         this._offsetWithinSlice += dataSlice.length;
                     };
 
-                    if (pending > 0)
-                        this._readNextSlice().then(
-                            asyncOperation, // load the slice
-                            () => {
-                                this.eofReached = true;
-                                resolve(byteArray);
-                            }); // no more slices are there
+                    if (this.eofReached) {
+                        //no left buffer
+                        this.eofReached = true;
+                        resolve(byteArray);
+                    }
+                    else if (pending > 0)
+                        this._readNextSlice().then(asyncOperation);
                     else
                         resolve(byteArray);
                 };
@@ -93,7 +98,7 @@
         private _readSlice(offset: number) {
             return new Promise<void>((resolve, reject) => {
                 var postOffsetSize = this._blob.size - offset;
-                if (postOffsetSize <= 0)
+                if (postOffsetSize < 0) // allows 0 to allow seeking to end position
                     reject(new Error("Offset parameter exceeds blob size."));
                 else {
                     var end = offset + Math.min(this._sliceSize, postOffsetSize);
