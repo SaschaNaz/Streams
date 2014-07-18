@@ -16,13 +16,15 @@
         }
         BlobSourceBuffer.prototype.produce = function (size) {
             //First empty _countercurrent if there is any element
+            //Will return Promise<number[]>
         };
-        BlobSourceBuffer.prototype.reattach = function () {
+        BlobSourceBuffer.prototype.reattach = function (byteArray) {
             //attach unconsumed data to _countercurrent
         };
         BlobSourceBuffer.prototype.seek = function (offset) {
             //if the offset paramater is within current slice: simply change _sliceOffset
             //else: read new slice by _readSlice(offset);
+            //Will return Promise<void>
         };
 
         BlobSourceBuffer.prototype._readNextSlice = function () {

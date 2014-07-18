@@ -27,13 +27,15 @@
 
         produce(size: number) {
             //First empty _countercurrent if there is any element
+            //Will return Promise<number[]>
         }
-        reattach() {
+        reattach(byteArray: number[]) {
             //attach unconsumed data to _countercurrent
         }
         seek(offset: number) {
             //if the offset paramater is within current slice: simply change _sliceOffset
             //else: read new slice by _readSlice(offset);
+            //Will return Promise<void>
         }
 
         private _readNextSlice() {
