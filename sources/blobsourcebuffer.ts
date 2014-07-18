@@ -59,7 +59,7 @@
                     else
                         resolve(byteArray);
                 };
-                window.setImmediate(asyncOperation);
+                asyncOperation();
             });
         }
         /** Reattaches unconsumed data to _countercurrent. */

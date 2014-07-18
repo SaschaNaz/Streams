@@ -25,10 +25,7 @@
 }
 declare module Streams {
     class BlobStream {
-        private _dataBufferOffset;
         private _readDataBuffer;
-        private _splicedBinaryBuffer;
-        private _leftCost;
         private _pendingRead;
         private _eofReached;
         public pullAmount: number;
@@ -37,11 +34,7 @@ declare module Streams {
         constructor(blob: Blob);
         public read(): Promise<StreamReadResult>;
         public readBytes(size?: number): Promise<StreamReadResult>;
-        private _mergeArray(base, input);
-        private _outputData(byteArray, amountConsumed);
-        private _readNextSlice();
-        public readLine(): Promise<string>;
-        public readLines(oneach?: (result: string) => any): Promise<void>;
+        private _outputData(byteArray);
     }
 }
 declare var BlobStream: typeof Streams.BlobStream;

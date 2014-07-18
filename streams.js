@@ -61,7 +61,7 @@
                     else
                         resolve(byteArray);
                 };
-                window.setImmediate(asyncOperation);
+                asyncOperation();
             });
         };
 
@@ -123,58 +123,32 @@ var Streams;
 (function (Streams) {
     var BlobStream = (function () {
         function BlobStream(blob) {
-            this._dataBufferOffset = 0;
             this._readDataBuffer = null;
-            this._splicedBinaryBuffer = new ArrayBuffer(0);
             this._pendingRead = null;
             this._eofReached = false;
             //private _readBytesPullAmount = 0;
             //private _amountBeingReturned = 0;
             this.pullAmount = 1024 * 1024 * 10;
             this.readBytesAs = "as-is";
-            this._leftCost = blob.size;
-            this._readDataBuffer = blob;
+            this.readEncoding = "utf-8";
+            this._readDataBuffer = new Streams.BlobSourceBuffer(blob);
         }
         BlobStream.prototype.read = function () {
-            var leftInBuffer = this._splicedBinaryBuffer.byteLength - this._dataBufferOffset;
-            if (leftInBuffer * 2 >= this.pullAmount)
-                return this.readBytes(leftInBuffer);
-            else
-                return this.readBytes(leftInBuffer + this.pullAmount);
+            return this.readBytes(this.pullAmount);
         };
 
         BlobStream.prototype.readBytes = function (size) {
             var _this = this;
+            if (typeof size === "undefined") { size = this.pullAmount; }
             if (this._pendingRead != null)
                 throw new Error("InvalidStateError");
 
             var readPromise = new Promise(function (resolve, reject) {
-                var byteArray = [];
-                var pending = size;
-                var asyncOperation = function () {
-                    var sliceLength = Math.min(pending, _this._splicedBinaryBuffer.byteLength - _this._dataBufferOffset);
-                    if (sliceLength > 0) {
-                        var slice = new Uint8Array(_this._splicedBinaryBuffer, _this._dataBufferOffset, size);
-                        _this._mergeArray(byteArray, Array.prototype.map.call(slice, function (n) {
-                            return n;
-                        }));
-                        pending -= sliceLength;
-                        _this._dataBufferOffset += slice.length;
-                    }
-                    ;
-
-                    if (pending > 0)
-                        _this._readNextSlice().then(asyncOperation, function () {
-                            _this._eofReached = true;
-                            resolve(returnData());
-                        }); // no more slices are there
-                    else
-                        resolve(returnData());
-                };
-                var returnData = function () {
-                    return _this._outputData(byteArray, size - pending);
-                };
-                window.setImmediate(asyncOperation);
+                window.setImmediate(function () {
+                    _this._readDataBuffer.produce(size).then(function (byteArray) {
+                        resolve(_this._outputData(byteArray));
+                    });
+                });
             });
 
             this._pendingRead = {
@@ -191,12 +165,9 @@ var Streams;
             return readPromise;
         };
 
-        BlobStream.prototype._mergeArray = function (base, input) {
-            Array.prototype.push.apply(base, input);
-        };
-
-        BlobStream.prototype._outputData = function (byteArray, amountConsumed) {
+        BlobStream.prototype._outputData = function (byteArray) {
             var data;
+            var amountConsumed = byteArray.length;
             switch (this.readBytesAs) {
                 case "arraybuffer":
                 case "as-is":
@@ -222,73 +193,6 @@ var Streams;
                 eof: this._eofReached,
                 error: null
             };
-        };
-
-        BlobStream.prototype._readNextSlice = function () {
-            var _this = this;
-            var start = this._readDataBuffer.size - this._leftCost;
-            return new Promise(function (resolve, reject) {
-                if (_this._leftCost == 0)
-                    reject(new Error("No left input stream"));
-                else {
-                    var reader = new FileReader();
-                    reader.onload = function (ev) {
-                        _this._splicedBinaryBuffer = ev.target.result;
-                        _this._leftCost -= blobSlice.size;
-                        _this._dataBufferOffset = 0;
-                        resolve(undefined);
-                    };
-                    var blobSlice;
-                    if (_this._leftCost < _this.pullAmount)
-                        blobSlice = _this._readDataBuffer.slice(start, start + _this._leftCost);
-                    else
-                        blobSlice = _this._readDataBuffer.slice(start, start + _this.pullAmount);
-                    reader.readAsArrayBuffer(blobSlice);
-                }
-            });
-        };
-
-        BlobStream.prototype.readLine = function () {
-            var _this = this;
-            var result = '';
-            var view = new Uint8Array(this._splicedBinaryBuffer);
-            return new Promise(function (resolve, reject) {
-                var asyncFunction = function () {
-                    var i = Array.prototype.indexOf.call(view, 0x0A, _this._dataBufferOffset);
-                    if (i == -1) {
-                        if (_this._leftCost) {
-                            result += String.fromCharCode.apply(null, view.subarray(_this._dataBufferOffset));
-                            _this._readNextSlice().then(function () {
-                                i = 0;
-                                view = new Uint8Array(_this._splicedBinaryBuffer);
-                                window.setImmediate(asyncFunction);
-                            });
-                        } else
-                            resolve(null);
-                    } else {
-                        result += String.fromCharCode.apply(null, view.subarray(_this._dataBufferOffset, i));
-                        _this._dataBufferOffset = i + 1;
-                        resolve(result);
-                    }
-                };
-                asyncFunction();
-            });
-        };
-
-        BlobStream.prototype.readLines = function (oneach) {
-            var _this = this;
-            return new Promise(function (resolve, reject) {
-                var asyncFunction = function () {
-                    _this.readLine().then(function (result) {
-                        window.setImmediate(oneach, result);
-                        if (_this._leftCost > 0)
-                            window.setImmediate(asyncFunction);
-                        else
-                            resolve(undefined);
-                    });
-                };
-                asyncFunction();
-            });
         };
         return BlobStream;
     })();
