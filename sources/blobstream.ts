@@ -1,6 +1,6 @@
 ﻿module Streams {
     interface PendingReadDescriptor {
-        promise: Promise<StreamReadResult>;
+        promise: Promise<StreamReadResult<any>>;
         remaining: number;
         destination: WritableStream;
         bytesAs: string;
@@ -27,17 +27,21 @@
         }
 
         read() {
-            return this.readBytes(this.pullAmount);
+            return this._readBytes<ArrayBuffer>(this.pullAmount);
         }
 
-        readBytes(size = this.pullAmount) {
+        readBytes<T>(size = this.pullAmount) {
+            return this._readBytes<T>(size, this.readBytesAs);
+        }
+
+        private _readBytes<T>(size: number, bytesAs = 'as-is') {
             if (this._pendingRead != null)
                 throw new Error("InvalidStateError");
 
-            var readPromise = new Promise<StreamReadResult>((resolve, reject) => {
+            var readPromise = new Promise<StreamReadResult<T>>((resolve, reject) => {
                 window.setImmediate(() => {
                     this._readDataBuffer.produce(size).then((byteArray) => {
-                        resolve(this._outputData(byteArray));
+                        resolve(this._outputData<T>(byteArray));
                     });
                 });
             });
@@ -46,7 +50,7 @@
                 promise: readPromise,
                 remaining: size,
                 destination: null,
-                bytesAs: this.readBytesAs,
+                bytesAs: bytesAs,
                 encoding: this.readEncoding
             };
             //if (size !== undefined)
@@ -55,7 +59,7 @@
             return readPromise;
         }
 
-        private _outputData(byteArray: number[]) {
+        private _outputData<T>(byteArray: number[]) {
             var data: any;
             var amountConsumed = byteArray.length;
             switch (this._pendingRead.bytesAs) {
@@ -76,7 +80,7 @@
             }
 
             this._pendingRead = null;
-            return <StreamReadResult>{
+            return <StreamReadResult<T>>{
                 amountConsumed: amountConsumed,
                 data: data,
                 eof: this._eofReached,

@@ -7,32 +7,32 @@
     writeEncoding: string;
 }
 
-interface ReadableStream {
+interface ReadableStream<T> {
     pullAmount: number;
 
-    read(): Promise<StreamReadResult>;
-    pipe(destination: WritableStream): Promise<StreamReadResult>;
-    fork(): ReadableStream;
+    read(): Promise<StreamReadResult<T>>;
+    pipe(destination: WritableStream): Promise<StreamReadResult<T>>;
+    fork(): ReadableStream<T>;
     readAbort(reason: any): Promise<void>;
 
     readBytesAs: string;//StreamReadType
     readEncoding: string;
 
-    readBytes(size?: number): Promise<StreamReadResult>;
-    pipeBytes(destination: WritableStream, size?: number): Promise<StreamReadResult>;
+    readBytes<T2>(size?: number): Promise<StreamReadResult<T2>>;
+    pipeBytes<T2>(destination: WritableStream, size?: number): Promise<StreamReadResult<T2>>;
 }
 
-interface ByteStream extends WritableStream, ReadableStream {
+interface ByteStream extends WritableStream, ReadableStream<any> {
 }
 
-interface StreamReadResult {
+interface StreamReadResult<T> {
     eof: boolean;
-    data: any;
+    data: T;
     amountConsumed: number;
     error: any;
 }
 
 interface URL {
-    createObjectURL(stream: ReadableStream, type: string): string;
-    createFor(stream: ReadableStream, type: string): string;
+    createObjectURL(stream: ReadableStream<any>, type: string): string;
+    createFor(stream: ReadableStream<any>, type: string): string;
 }

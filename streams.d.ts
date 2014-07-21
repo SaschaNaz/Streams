@@ -34,9 +34,10 @@ declare module Streams {
         public readBytesAs: string;
         public readEncoding: string;
         constructor(blob: Blob);
-        public read(): Promise<StreamReadResult>;
-        public readBytes(size?: number): Promise<StreamReadResult>;
-        private _outputData(byteArray);
+        public read(): Promise<StreamReadResult<ArrayBuffer>>;
+        public readBytes<T>(size?: number): Promise<StreamReadResult<T>>;
+        private _readBytes<T>(size, bytesAs?);
+        private _outputData<T>(byteArray);
     }
 }
 interface BlobStream extends Streams.BlobStream {
@@ -49,28 +50,28 @@ interface WritableStream {
     writeAbort(reason?: any): Promise<void>;
     writeEncoding: string;
 }
-interface ReadableStream {
+interface ReadableStream<T> {
     pullAmount: number;
-    read(): Promise<StreamReadResult>;
-    pipe(destination: WritableStream): Promise<StreamReadResult>;
-    fork(): ReadableStream;
+    read(): Promise<StreamReadResult<T>>;
+    pipe(destination: WritableStream): Promise<StreamReadResult<T>>;
+    fork(): ReadableStream<T>;
     readAbort(reason: any): Promise<void>;
     readBytesAs: string;
     readEncoding: string;
-    readBytes(size?: number): Promise<StreamReadResult>;
-    pipeBytes(destination: WritableStream, size?: number): Promise<StreamReadResult>;
+    readBytes<T2>(size?: number): Promise<StreamReadResult<T2>>;
+    pipeBytes<T2>(destination: WritableStream, size?: number): Promise<StreamReadResult<T2>>;
 }
-interface ByteStream extends WritableStream, ReadableStream {
+interface ByteStream extends WritableStream, ReadableStream<any> {
 }
-interface StreamReadResult {
+interface StreamReadResult<T> {
     eof: boolean;
-    data: any;
+    data: T;
     amountConsumed: number;
     error: any;
 }
 interface URL {
-    createObjectURL(stream: ReadableStream, type: string): string;
-    createFor(stream: ReadableStream, type: string): string;
+    createObjectURL(stream: ReadableStream<any>, type: string): string;
+    createFor(stream: ReadableStream<any>, type: string): string;
 }
 declare module Streams {
     interface DecodingResult {

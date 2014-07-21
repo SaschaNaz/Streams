@@ -156,12 +156,17 @@ var Streams;
         });
 
         BlobStream.prototype.read = function () {
-            return this.readBytes(this.pullAmount);
+            return this._readBytes(this.pullAmount);
         };
 
         BlobStream.prototype.readBytes = function (size) {
-            var _this = this;
             if (typeof size === "undefined") { size = this.pullAmount; }
+            return this._readBytes(size, this.readBytesAs);
+        };
+
+        BlobStream.prototype._readBytes = function (size, bytesAs) {
+            var _this = this;
+            if (typeof bytesAs === "undefined") { bytesAs = 'as-is'; }
             if (this._pendingRead != null)
                 throw new Error("InvalidStateError");
 
@@ -177,7 +182,7 @@ var Streams;
                 promise: readPromise,
                 remaining: size,
                 destination: null,
-                bytesAs: this.readBytesAs,
+                bytesAs: bytesAs,
                 encoding: this.readEncoding
             };
 
