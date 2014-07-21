@@ -127,12 +127,6 @@
     })();
     Streams.BlobSourceBuffer = BlobSourceBuffer;
 })(Streams || (Streams = {}));
-var __extends = this.__extends || function (d, b) {
-    for (var p in b) if (b.hasOwnProperty(p)) d[p] = b[p];
-    function __() { this.constructor = d; }
-    __.prototype = b.prototype;
-    d.prototype = new __();
-};
 var Streams;
 (function (Streams) {
     var BlobStream = (function () {
@@ -226,13 +220,8 @@ var Streams;
     })();
     Streams.BlobStream = BlobStream;
 })(Streams || (Streams = {}));
-var BlobStream = (function (_super) {
-    __extends(BlobStream, _super);
-    function BlobStream() {
-        _super.apply(this, arguments);
-    }
-    return BlobStream;
-})(Streams.BlobStream);
+
+var BlobStream = Streams.BlobStream;
 //class _ByteStream implements ByteStream {
 //    _readableStream = new _ReadableStream();
 //    _writableStream = new _WritableStream();
