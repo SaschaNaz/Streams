@@ -22,7 +22,7 @@
         }
         get byteOffset() {
             /* slice offset + offset within slice - countercurrent length */
-            return (this._blob.size - this._leftCost) + this._offsetWithinSlice - this._countercurrent.length;
+            return (this._blob.size - this._leftCost - this._slicedCurrent.byteLength) + this._offsetWithinSlice - this._countercurrent.length;
         }
         constructor(blob: Blob) {
             this._blob = blob;

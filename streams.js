@@ -26,7 +26,7 @@
         Object.defineProperty(BlobSourceBuffer.prototype, "byteOffset", {
             get: function () {
                 /* slice offset + offset within slice - countercurrent length */
-                return (this._blob.size - this._leftCost) + this._offsetWithinSlice - this._countercurrent.length;
+                return (this._blob.size - this._leftCost - this._slicedCurrent.byteLength) + this._offsetWithinSlice - this._countercurrent.length;
             },
             enumerable: true,
             configurable: true
