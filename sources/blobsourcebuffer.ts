@@ -20,6 +20,10 @@
                 && this._offsetWithinSlice == this._slicedCurrent.byteLength
                 && this._countercurrent.length == 0;
         }
+        get byteOffset() {
+            /* slice offset + offset within slice - countercurrent length */
+            return (this._blob.size - this._leftCost) + this._offsetWithinSlice - this._countercurrent.length;
+        }
         constructor(blob: Blob) {
             this._blob = blob;
             this._leftCost = blob.size;

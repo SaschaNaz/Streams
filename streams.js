@@ -23,6 +23,14 @@
             enumerable: true,
             configurable: true
         });
+        Object.defineProperty(BlobSourceBuffer.prototype, "byteOffset", {
+            get: function () {
+                /* slice offset + offset within slice - countercurrent length */
+                return (this._blob.size - this._leftCost) + this._offsetWithinSlice - this._countercurrent.length;
+            },
+            enumerable: true,
+            configurable: true
+        });
 
         BlobSourceBuffer.prototype.produce = function (size) {
             var _this = this;

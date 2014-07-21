@@ -13,6 +13,9 @@
         private get _eofReached() {
             return this._readDataBuffer.eofReached;
         }
+        get byteOffset() {
+            return this._readDataBuffer.byteOffset;
+        }
         //private _readBytesPullAmount = 0;
         //private _amountBeingReturned = 0;
 

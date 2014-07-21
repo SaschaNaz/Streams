@@ -12,6 +12,7 @@
         private _offsetWithinSlice;
         private _sliceSize;
         public eofReached : boolean;
+        public byteOffset : number;
         constructor(blob: Blob);
         public produce(size: number): Promise<number[]>;
         /** Reattaches unconsumed data to _countercurrent. */
