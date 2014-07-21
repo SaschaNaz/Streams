@@ -10,7 +10,6 @@
         private _slicedCurrent = new ArrayBuffer(0);
         /** Countercurrent stack. Last unconsumed data would be pushed into here and later popped out first. */
         private _countercurrent: number[] = [];
-        private _blob: Blob;
         /** Represents byte length of unsliced part. */
         private _leftCost: number;
         private _offsetWithinSlice: number;
@@ -22,10 +21,9 @@
         }
         get byteOffset() {
             /* slice offset + offset within slice - countercurrent length */
-            return (this._blob.size - this._leftCost - this._slicedCurrent.byteLength) + this._offsetWithinSlice - this._countercurrent.length;
+            return (this.blob.size - this._leftCost - this._slicedCurrent.byteLength) + this._offsetWithinSlice - this._countercurrent.length;
         }
-        constructor(blob: Blob) {
-            this._blob = blob;
+        constructor(public blob: Blob) {
             this._leftCost = blob.size;
         }
 
@@ -85,7 +83,7 @@
 
             this._exportCountercurrent(Infinity); // flush countercurrent
 
-            var sliceEndOffset = this._blob.size - this._leftCost;
+            var sliceEndOffset = this.blob.size - this._leftCost;
             var sliceStartOffset = sliceEndOffset - this._slicedCurrent.byteLength;
             if (offset >= sliceStartOffset && offset < sliceEndOffset) {
                 this._offsetWithinSlice = offset - sliceStartOffset;
@@ -96,12 +94,12 @@
         }
 
         private _readNextSlice() {
-            return this._readSlice(this._blob.size - this._leftCost);
+            return this._readSlice(this.blob.size - this._leftCost);
         }
 
         private _readSlice(offset: number) {
             return new Promise<void>((resolve, reject) => {
-                var postOffsetSize = this._blob.size - offset;
+                var postOffsetSize = this.blob.size - offset;
                 if (postOffsetSize < 0) // allows 0 to allow seeking to end position
                     reject(new Error("Offset parameter exceeds blob size."));
                 else {
@@ -110,11 +108,11 @@
                     var reader = new FileReader();
                     reader.onload = (ev: ProgressEvent) => {
                         this._slicedCurrent = <ArrayBuffer>(<FileReader>ev.target).result;
-                        this._leftCost = this._blob.size - end;
+                        this._leftCost = this.blob.size - end;
                         this._offsetWithinSlice = 0;
                         resolve(undefined);
                     };
-                    reader.readAsArrayBuffer(this._blob.slice(offset, end));
+                    reader.readAsArrayBuffer(this.blob.slice(offset, end));
                 }
             });
         }

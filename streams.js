@@ -5,6 +5,7 @@
     */
     var BlobSourceBuffer = (function () {
         function BlobSourceBuffer(blob) {
+            this.blob = blob;
             /*
             _readNextSlice method will be internalized here
             _readDataBuffer would be this
@@ -13,7 +14,6 @@
             /** Countercurrent stack. Last unconsumed data would be pushed into here and later popped out first. */
             this._countercurrent = [];
             this._sliceSize = 1024 * 1024 * 10;
-            this._blob = blob;
             this._leftCost = blob.size;
         }
         Object.defineProperty(BlobSourceBuffer.prototype, "eofReached", {
@@ -26,7 +26,7 @@
         Object.defineProperty(BlobSourceBuffer.prototype, "byteOffset", {
             get: function () {
                 /* slice offset + offset within slice - countercurrent length */
-                return (this._blob.size - this._leftCost - this._slicedCurrent.byteLength) + this._offsetWithinSlice - this._countercurrent.length;
+                return (this.blob.size - this._leftCost - this._slicedCurrent.byteLength) + this._offsetWithinSlice - this._countercurrent.length;
             },
             enumerable: true,
             configurable: true
@@ -90,7 +90,7 @@
             */
             this._exportCountercurrent(Infinity); // flush countercurrent
 
-            var sliceEndOffset = this._blob.size - this._leftCost;
+            var sliceEndOffset = this.blob.size - this._leftCost;
             var sliceStartOffset = sliceEndOffset - this._slicedCurrent.byteLength;
             if (offset >= sliceStartOffset && offset < sliceEndOffset) {
                 this._offsetWithinSlice = offset - sliceStartOffset;
@@ -100,13 +100,13 @@
         };
 
         BlobSourceBuffer.prototype._readNextSlice = function () {
-            return this._readSlice(this._blob.size - this._leftCost);
+            return this._readSlice(this.blob.size - this._leftCost);
         };
 
         BlobSourceBuffer.prototype._readSlice = function (offset) {
             var _this = this;
             return new Promise(function (resolve, reject) {
-                var postOffsetSize = _this._blob.size - offset;
+                var postOffsetSize = _this.blob.size - offset;
                 if (postOffsetSize < 0)
                     reject(new Error("Offset parameter exceeds blob size."));
                 else {
@@ -115,11 +115,11 @@
                     var reader = new FileReader();
                     reader.onload = function (ev) {
                         _this._slicedCurrent = ev.target.result;
-                        _this._leftCost = _this._blob.size - end;
+                        _this._leftCost = _this.blob.size - end;
                         _this._offsetWithinSlice = 0;
                         resolve(undefined);
                     };
-                    reader.readAsArrayBuffer(_this._blob.slice(offset, end));
+                    reader.readAsArrayBuffer(_this.blob.slice(offset, end));
                 }
             });
         };
@@ -150,6 +150,13 @@ var Streams;
         Object.defineProperty(BlobStream.prototype, "byteOffset", {
             get: function () {
                 return this._readDataBuffer.byteOffset;
+            },
+            enumerable: true,
+            configurable: true
+        });
+        Object.defineProperty(BlobStream.prototype, "blob", {
+            get: function () {
+                return this._readDataBuffer.blob;
             },
             enumerable: true,
             configurable: true

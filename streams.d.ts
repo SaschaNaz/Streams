@@ -3,10 +3,10 @@
     Produces requested data and reattaches unconsumed data.
     */
     class BlobSourceBuffer {
+        public blob: Blob;
         private _slicedCurrent;
         /** Countercurrent stack. Last unconsumed data would be pushed into here and later popped out first. */
         private _countercurrent;
-        private _blob;
         /** Represents byte length of unsliced part. */
         private _leftCost;
         private _offsetWithinSlice;
@@ -30,6 +30,7 @@ declare module Streams {
         private _pendingRead;
         private _eofReached;
         public byteOffset : number;
+        public blob : Blob;
         public pullAmount: number;
         public readBytesAs: string;
         public readEncoding: string;

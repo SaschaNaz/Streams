@@ -16,6 +16,9 @@
         get byteOffset() {
             return this._readDataBuffer.byteOffset;
         }
+        get blob() {
+            return this._readDataBuffer.blob;
+        }
         //private _readBytesPullAmount = 0;
         //private _amountBeingReturned = 0;
 
