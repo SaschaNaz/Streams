@@ -32,11 +32,16 @@
         fork() {
             var blobStream = new BlobStream(this._readDataBuffer.blob);
             blobStream._readDataBuffer = this._readDataBuffer.fork();
+            blobStream.readBytesAs = this.readBytesAs;
+            blobStream.readEncoding = this.readEncoding;
             return blobStream;
         }
 
         slice(start = 0, end = this._readDataBuffer.blob.size) {
-            return new BlobStream(this._readDataBuffer.blob.slice(start, end));
+            var blobStream = new BlobStream(this._readDataBuffer.blob.slice(start, end));
+            blobStream.readBytesAs = this.readBytesAs;
+            blobStream.readEncoding = this.readEncoding;
+            return blobStream;
         }
 
         seek(offset: number) {

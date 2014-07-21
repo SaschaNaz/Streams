@@ -174,13 +174,18 @@ var Streams;
         BlobStream.prototype.fork = function () {
             var blobStream = new BlobStream(this._readDataBuffer.blob);
             blobStream._readDataBuffer = this._readDataBuffer.fork();
+            blobStream.readBytesAs = this.readBytesAs;
+            blobStream.readEncoding = this.readEncoding;
             return blobStream;
         };
 
         BlobStream.prototype.slice = function (start, end) {
             if (typeof start === "undefined") { start = 0; }
             if (typeof end === "undefined") { end = this._readDataBuffer.blob.size; }
-            return new BlobStream(this._readDataBuffer.blob.slice(start, end));
+            var blobStream = new BlobStream(this._readDataBuffer.blob.slice(start, end));
+            blobStream.readBytesAs = this.readBytesAs;
+            blobStream.readEncoding = this.readEncoding;
+            return blobStream;
         };
 
         BlobStream.prototype.seek = function (offset) {
