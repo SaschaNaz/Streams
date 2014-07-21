@@ -58,7 +58,7 @@
         private _outputData(byteArray: number[]) {
             var data: any;
             var amountConsumed = byteArray.length;
-            switch (this.readBytesAs) {
+            switch (this._pendingRead.bytesAs) {
                 case "arraybuffer":
                 case "as-is":
                     data = new Uint8Array(byteArray).buffer;
