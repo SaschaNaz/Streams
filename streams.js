@@ -147,6 +147,13 @@ var Streams;
             enumerable: true,
             configurable: true
         });
+        Object.defineProperty(BlobStream.prototype, "byteOffset", {
+            get: function () {
+                return this._readDataBuffer.byteOffset;
+            },
+            enumerable: true,
+            configurable: true
+        });
 
         BlobStream.prototype.read = function () {
             return this.readBytes(this.pullAmount);

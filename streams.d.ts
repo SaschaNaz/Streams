@@ -29,6 +29,7 @@ declare module Streams {
         private _readDataBuffer;
         private _pendingRead;
         private _eofReached;
+        public byteOffset : number;
         public pullAmount: number;
         public readBytesAs: string;
         public readEncoding: string;
