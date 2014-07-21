@@ -13,6 +13,7 @@
             this._slicedCurrent = new ArrayBuffer(0);
             /** Countercurrent stack. Last unconsumed data would be pushed into here and later popped out first. */
             this._countercurrent = [];
+            this._offsetWithinSlice = 0;
             this._sliceSize = 1024 * 1024 * 10;
             this._leftCost = blob.size;
         }

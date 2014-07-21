@@ -12,7 +12,7 @@
         private _countercurrent: number[] = [];
         /** Represents byte length of unsliced part. */
         private _leftCost: number;
-        private _offsetWithinSlice: number;
+        private _offsetWithinSlice = 0;
         private _sliceSize = 1024 * 1024 * 10;
         get eofReached() {
             return this._leftCost == 0
