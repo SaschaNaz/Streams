@@ -155,6 +155,4 @@
     }
 }
 
-interface BlobStream extends Streams.BlobStream {
-}
-var BlobStream = Streams.BlobStream;
+import BlobStream = Streams.BlobStream;
