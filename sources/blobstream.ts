@@ -128,4 +128,5 @@
         //}
     }
 }
-var BlobStream = Streams.BlobStream;
+class BlobStream extends Streams.BlobStream {
+}

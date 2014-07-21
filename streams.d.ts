@@ -39,7 +39,8 @@ declare module Streams {
         private _outputData(byteArray);
     }
 }
-declare var BlobStream: typeof Streams.BlobStream;
+declare class BlobStream extends Streams.BlobStream {
+}
 interface WritableStream {
     write(data: any, costOverride?: number): Promise<number>;
     awaitSpaceAvailable(): Promise<number>;
