@@ -29,6 +29,20 @@
             this._readDataBuffer = new BlobSourceBuffer(blob);
         }
 
+        fork() {
+            var blobStream = new BlobStream(this._readDataBuffer.blob);
+            blobStream._readDataBuffer = this._readDataBuffer.fork();
+            return blobStream;
+        }
+
+        slice(start = 0, end = this._readDataBuffer.blob.size) {
+            return new BlobStream(this._readDataBuffer.blob.slice(start, end));
+        }
+
+        seek(offset: number) {
+            return this._readDataBuffer.seek(offset);
+        }
+
         read() {
             return this._readBytes<ArrayBuffer>(this.pullAmount);
         }

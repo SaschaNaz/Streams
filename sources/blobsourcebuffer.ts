@@ -26,6 +26,14 @@
         constructor(public blob: Blob) {
             this._leftCost = blob.size;
         }
+        fork() {
+            var buffer = new BlobSourceBuffer(this.blob);
+            buffer._slicedCurrent = this._slicedCurrent;
+            buffer._offsetWithinSlice = this._offsetWithinSlice;
+            buffer._leftCost = this._leftCost;
+            buffer._countercurrent = this._countercurrent.slice();
+            return buffer;
+        }
 
         produce(size: number) {
             return new Promise<number[]>((resolve, reject) => {

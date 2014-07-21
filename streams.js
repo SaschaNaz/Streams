@@ -32,6 +32,15 @@
             configurable: true
         });
 
+        BlobSourceBuffer.prototype.fork = function () {
+            var buffer = new BlobSourceBuffer(this.blob);
+            buffer._slicedCurrent = this._slicedCurrent;
+            buffer._offsetWithinSlice = this._offsetWithinSlice;
+            buffer._leftCost = this._leftCost;
+            buffer._countercurrent = this._countercurrent.slice();
+            return buffer;
+        };
+
         BlobSourceBuffer.prototype.produce = function (size) {
             var _this = this;
             return new Promise(function (resolve, reject) {
@@ -161,6 +170,22 @@ var Streams;
             enumerable: true,
             configurable: true
         });
+
+        BlobStream.prototype.fork = function () {
+            var blobStream = new BlobStream(this._readDataBuffer.blob);
+            blobStream._readDataBuffer = this._readDataBuffer.fork();
+            return blobStream;
+        };
+
+        BlobStream.prototype.slice = function (start, end) {
+            if (typeof start === "undefined") { start = 0; }
+            if (typeof end === "undefined") { end = this._readDataBuffer.blob.size; }
+            return new BlobStream(this._readDataBuffer.blob.slice(start, end));
+        };
+
+        BlobStream.prototype.seek = function (offset) {
+            return this._readDataBuffer.seek(offset);
+        };
 
         BlobStream.prototype.read = function () {
             return this._readBytes(this.pullAmount);

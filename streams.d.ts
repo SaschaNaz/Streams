@@ -14,6 +14,7 @@
         public eofReached : boolean;
         public byteOffset : number;
         constructor(blob: Blob);
+        public fork(): BlobSourceBuffer;
         public produce(size: number): Promise<number[]>;
         /** Reattaches unconsumed data to _countercurrent. */
         public reattach(byteArray: number[]): void;
@@ -35,6 +36,9 @@ declare module Streams {
         public readBytesAs: string;
         public readEncoding: string;
         constructor(blob: Blob);
+        public fork(): BlobStream;
+        public slice(start?: number, end?: number): BlobStream;
+        public seek(offset: number): Promise<void>;
         public read(): Promise<StreamReadResult<ArrayBuffer>>;
         public readBytes<T>(size?: number): Promise<StreamReadResult<T>>;
         private _readBytes<T>(size, bytesAs?);
